@@ -22,7 +22,8 @@ jobs:
         run: |
           mkdir -p build
           cd libiconv
-          LDFLAGS="-sMODULARIZE=1 -sSTANDALONE_WASM" emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
+          export LDFLAGS="-sSTANDALONE_WASM=1"
+          emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
           emmake make install
         
       - name: Archive artifacts
