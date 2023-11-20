@@ -16,11 +16,11 @@ jobs:
       - name: Download source
         run: |
           wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
-          tar -xf libiconv-*.tar.gz
+          tar -xf libiconv-1.17.tar.gz
         
       - name: Build
         run: |
-          cd libiconv-*
+          cd libiconv-1.17
           mkdir -p build
           sh ./configure --prefix="$PWD/build"
           make install
