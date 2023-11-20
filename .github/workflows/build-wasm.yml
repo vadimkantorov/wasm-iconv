@@ -5,10 +5,10 @@ jobs:
   build-wasm:
     runs-on: ubuntu-22.04
     steps:    
-#      - name: Setup Emscripten
-#        uses: mymindstorm/setup-emsdk@v10
-#        with:
-#          version: 3.1.43
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v10
+        with:
+          version: 3.1.43
 
       - name: Install Prerequisites
         run:  sudo apt-get install -y wget git
@@ -22,8 +22,8 @@ jobs:
         run: |
           mkdir -p build
           cd libiconv
-          sh ./configure --prefix="$PWD/../build" --enable-static --disable-shared
-          make install
+          emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
+          emmake make install
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
