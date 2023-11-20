@@ -16,13 +16,13 @@ jobs:
       - name: Download source
         run: |
           wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
-          tar -xf libiconv-1.17.tar.gz
+          mkdir libiconv && tar -xf libiconv-1.17.tar.gz -C libiconv --strip-components=1
         
       - name: Build
         run: |
-          cd libiconv-1.17
           mkdir -p build
-          sh ./configure --prefix="$PWD/build"
+          cd libiconv
+          sh ./configure --prefix="$PWD/../build"
           make install
         
       - name: Archive artifacts
