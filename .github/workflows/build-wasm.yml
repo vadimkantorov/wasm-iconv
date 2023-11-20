@@ -22,7 +22,7 @@ jobs:
         run: |
           mkdir -p build
           cd libiconv
-          sh ./configure --prefix="$PWD/../build"
+          sh ./configure --prefix="$PWD/../build" --enable-static --disable-shared
           make install
         
       - name: Archive artifacts
