@@ -5,19 +5,16 @@ jobs:
   build-wasm:
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v2
+
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v10
         with:
           version: 3.1.43
 
-      - name: Install Prerequisites
-        run:  sudo apt-get install -y wget git
-
-      - uses: actions/checkout@v2
-
       - name: Download source
         run: |
-          wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
+          curl -L -O https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.17.tar.gz
           mkdir libiconv && tar -xf libiconv-1.17.tar.gz -C libiconv --strip-components=1
         
       - name: Build
@@ -26,8 +23,7 @@ jobs:
           emconfigure ./configure --enable-static --disable-shared
           emmake make
           # ./src/iconv
-          find . -name libiconv.a
-          emcc -Oz -o ../iconv.html --shell-file ../shell.html -sSINGLE_FILE -sMINIFY_HTML=0  ./src/iconv.o ./srclib/libicrt.a ./lib/libiconv.a
+          emcc -Oz -o ../iconv.html --shell-file ../shell.html -sSINGLE_FILE -sMINIFY_HTML=0  ./src/iconv.o ./srclib/libicrt.a ./lib/.libs/libiconv.a
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
