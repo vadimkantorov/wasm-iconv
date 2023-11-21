@@ -26,8 +26,8 @@ jobs:
           emmake make install
           # ./src/iconv
           rm ../build/bin/iconv
-          emcc -Oz -o ../build/bin/iconv.wasm  ./src/iconv.o  ./srclib/libicrt.a ../build/lib/libiconv.a
           emcc -Oz -o ../build/bin/iconv.html -sSINGLE_FILE  ./src/iconv.o ./srclib/libicrt.a ../build/lib/libiconv.a
+          emcc -Oz -o ../build/bin/iconv.wasm  ./src/iconv.o  ./srclib/libicrt.a ../build/lib/libiconv.a
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
