@@ -26,7 +26,7 @@ jobs:
           emcc -Oz -o ../iconv.html --shell-file ../shell.html -sSINGLE_FILE -sMINIFY_HTML=0  ./src/iconv.o ./srclib/libicrt.a ./lib/.libs/libiconv.a
         
       - name: Archive artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build
           path: iconv.html
