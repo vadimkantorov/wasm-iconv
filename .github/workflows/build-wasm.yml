@@ -4,7 +4,7 @@ jobs:
 
   build-wasm:
     runs-on: ubuntu-22.04
-    steps:    
+    steps:
       - name: Setup Emscripten
         uses: mymindstorm/setup-emsdk@v10
         with:
@@ -12,6 +12,8 @@ jobs:
 
       - name: Install Prerequisites
         run:  sudo apt-get install -y wget git
+
+      - uses: actions/checkout@v2
 
       - name: Download source
         run: |
@@ -26,7 +28,7 @@ jobs:
           emmake make install
           # ./src/iconv
           rm ../build/bin/iconv
-          emcc -Oz -o ../build/bin/iconv.html -sSINGLE_FILE  ./src/iconv.o ./srclib/libicrt.a ../build/lib/libiconv.a
+          emcc -Oz -o ../build/bin/iconv.html -sSINGLE_FILE --shell-file shell.html  ./src/iconv.o ./srclib/libicrt.a ../build/lib/libiconv.a
           emcc -Oz -o ../build/bin/iconv.wasm  ./src/iconv.o  ./srclib/libicrt.a ../build/lib/libiconv.a
         
       - name: Archive artifacts
