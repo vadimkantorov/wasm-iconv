@@ -25,7 +25,7 @@ jobs:
           emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
           emmake make install
           # ./src/iconv
-          rm ../build/bin/iconv && emcc -Oz -o ../build/bin/iconv.wasm   ./lib/iconv.o  ./srclib/libicrt.a ../build/lib/libiconv.a
+          rm ../build/bin/iconv && emcc -Oz -o ../build/bin/iconv.wasm  ./src/iconv.o  ./srclib/libicrt.a ../build/lib/libiconv.a
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
