@@ -23,19 +23,17 @@ jobs:
       - name: Build
         run: |
           cd libiconv
-          mkdir ../build
-          emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
-          emmake make install
+          emconfigure ./configure --enable-static --disable-shared
+          emmake make
           # ./src/iconv
-          rm ../build/bin/iconv
-          emcc -Oz -o ../build/bin/iconv.html -sSINGLE_FILE -sMINIFY_HTML=0 --shell-file ../shell.html  ./src/iconv.o ./srclib/libicrt.a ../build/lib/libiconv.a
-          #emcc -Oz -o ../build/bin/iconv.wasm  ./src/iconv.o  ./srclib/libicrt.a ../build/lib/libiconv.a
+          find . -name libiconv.a
+          emcc -Oz -o ../iconv.html --shell-file ../shell.html -sSINGLE_FILE -sMINIFY_HTML=0  ./src/iconv.o ./srclib/libicrt.a ./lib/libiconv.a
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
           name: build
-          path: build/
+          path: iconv.html
 #      - name: Create Release
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
