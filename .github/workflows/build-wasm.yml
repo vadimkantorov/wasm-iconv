@@ -20,8 +20,8 @@ jobs:
         
       - name: Build
         run: |
-          mkdir -p build
           cd libiconv
+          mkdir ../build
           emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
           emmake make install
           # ./src/iconv
