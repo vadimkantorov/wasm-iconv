@@ -23,8 +23,10 @@ jobs:
           mkdir -p build
           cd libiconv
           emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
-          export LDFLAGS="-sSTANDALONE_WASM=1"
           emmake make install
+          find . -name iconv.o
+          find . -name libicrt.a
+          #emcc -g -O2 iconv.o -o iconv  ../srclib/libicrt.a /home/runner/work/wasm-iconv/wasm-iconv/libiconv/../build/lib/libiconv.a
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
