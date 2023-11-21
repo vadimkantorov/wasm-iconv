@@ -64,24 +64,6 @@
         <textarea id="output" rows="8"></textarea>
 
         <script type="text/javascript">
-        function onclick()
-        {
-            const fileupload = document.getElementById('inputfile');
-            if(fileupload.files.length == 0)
-                return;
-
-            const file = fileupload.files[0];
-            const reader = new FileReader();
-            reader.onloadend = ev => {
-                if (evt.target.readyState == FileReader.DONE)
-                {
-                    this.FS.writeFile(dst_path, new Uint8Array(reader.result));
-                    resolve(dst_path);
-                }
-            }
-            reader.readAsArrayBuffer(file);
-        }
-
         var statusElement = document.getElementById('status');
         var progressElement = document.getElementById('progress');
         var spinnerElement = document.getElementById('spinner');
@@ -140,6 +122,25 @@
             if (text) console.error('[post-exception status] ' + text);
           };
         };
+        
+        function onclick()
+        {
+            const fileupload = document.getElementById('inputfile');
+            if(fileupload.files.length == 0)
+                return;
+
+            const file = fileupload.files[0];
+            const reader = new FileReader();
+            reader.onloadend = ev => {
+                if (evt.target.readyState == FileReader.DONE)
+                {
+                    Module.FS.writeFile(dst_path, new Uint8Array(reader.result));
+                    resolve(dst_path);
+                }
+            }
+            reader.readAsArrayBuffer(file);
+        }
+
         </script>
 
         {{{ SCRIPT }}}
