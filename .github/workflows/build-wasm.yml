@@ -24,9 +24,7 @@ jobs:
           cd libiconv
           emconfigure ./configure --prefix="$PWD/../build" --enable-static --disable-shared
           emmake make install
-          find . -name iconv.o
-          find . -name libicrt.a
-          #emcc -g -O2 iconv.o -o iconv  ../srclib/libicrt.a /home/runner/work/wasm-iconv/wasm-iconv/libiconv/../build/lib/libiconv.a
+          rm ../build/bin/iconv && emcc -Oz -o ../build/bin/iconv.wasm   ./lib/iconv.o  ../srclib/libicrt.a ../build/lib/libiconv.a
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
