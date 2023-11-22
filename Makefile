@@ -8,8 +8,6 @@ libiconv:
 	tar -xf libiconv-*.tar.gz -C $@
 
 iconv.html: libiconv
-	pushd $<
-	emconfigure ./configure --enable-static --disable-shared
-	popd
+	cd $< && emconfigure ./configure --enable-static --disable-shared && cd ..
 	emmake make -C libiconv
 	emcc -o $@ $(EM_LDFLAGS) $</src/iconv.o $</srclib/libicrt.a $</lib/.libs/libiconv.a
