@@ -48,14 +48,22 @@
                 statusElement.innerHTML = text;
             },
         };
-        Module.setStatus('Preparing...');
-        window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
-        
-        function iconv_onclick()
+
+        function iconv(input_uint8_array, input_encoding, output_encoding)
         {
             const input_path = 'input.bin', output_path = 'output.bin';
-            const args = ['-f', inputencoding.value, '-t', outputencoding.value, '-o', output_path, input_path];
+            //const args = ['-f', inputencoding.value, '-t', outputencoding.value, '-o', output_path, input_path];
+            const args = ['--help'];
 
+            Module.FS.writeFile(input_path, input_uint8_array);
+            console.log('exit code:', Module.callMain(args));
+            return null;
+            //const output_uint8_array = Module.FS.readFile(output_path);
+            //return output_uint8_array;
+        }
+
+        function iconv_onclick()
+        {
             if(fileupload.files.length == 0)
                 return;
 
@@ -66,14 +74,15 @@
                 if (evt.target.readyState == FileReader.DONE)
                 {
                     const input_uint8_array = new Uint8Array(reader.result);
-                    Module.FS.writeFile(input_path, input_uint8_array);
-                    Module.callMain(args);
-                    const output_uint8_array = Module.FS.readFile(output_path);
+                    const output_uint8_array = iconv(input_uint8_array, inputencoding.value, outputencoding.value);
                     console.log(output_uint8_array);
                 }
             }
             reader.readAsArrayBuffer(file);
         }
+        
+        Module.setStatus('Preparing...');
+        window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
 
         </script>
 
