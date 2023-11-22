@@ -6,20 +6,38 @@
         <input type="file" id="inputfile" name="inputfile" />
         <br />
         <label for="inputencoding">-f</label>
-        <input type="text" id="inputencoding" name="inputencoding" value="utf-8" />
+        <input type="text" id="inputencoding" name="inputencoding" value="UTF-8" />
+        <select id="inputencodings">
+            <option value="UTF-8" selected>UTF-8</option>
+            <option value="UTF-16">UTF-16</option>
+            <option disabled>--------</option>
+        </select>
         <br />
         <label for="outputencoding">-t</label>
-        <input type="text" id="outputencoding" name="outputencoding" value="utf-16" />
+        <input type="text" id="outputencoding" name="outputencoding" value="UTF-16" />
+        <select id="outputencodings">
+            <option value="UTF-8">UTF-8</option>
+            <option value="UTF-16" selected>UTF-16</option>
+            <option disabled>--------</option>
+        </select>
         <br />
         <button onclick="iconv_onclick()">iconv</button>
         <br />
         <a id="download">Download result</a>
+        <br />
+        Status:
+        <br />
+        <textarea id="status" cols="80" rows="30">
+        </textarea>
 
         <script type="text/javascript">
         // https://stackoverflow.com/questions/32912129/providing-stdin-to-an-emscripten-html-program/33119868#33119868
         // https://stackoverflow.com/questions/15980585/how-to-change-emscripten-browser-input-method-from-window-prompt-to-something-mo
         // https://github.com/emscripten-core/emscripten/issues/8231
         
+        const inputencodings = document.getElementById('inputencodings');
+        const outputencodings = document.getElementById('outputencodings');
+        const status = document.getElementById('status');
         const fileupload = document.getElementById('inputfile');
         const downloadElement = document.getElementById('download');
         const inputencoding = document.getElementById('inputencoding');
@@ -32,8 +50,31 @@
             output_stdout_binary : [],
             print: text => console.log(text),
             setStatus: text => console.log(text),
-            //stdin: () => null,
-            stdout: ord => Module.output_stdout_binary.push(ord)
+            stdout: ord => Module.output_stdout_binary.push(ord),
+            onRuntimeInitialized : () => 
+            {
+                Module.output_stdout_binary = [];
+                const exit_code1 = Module.callMain(['--help']);
+                const help = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary));
+                
+                Module.output_stdout_binary = [];
+                const exit_code2 = Module.callMain(['--list']);
+                const encodings = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary)).split(/[ ,\n]/).sort().filter(enc => enc);
+                
+                console.log(exit_code1, exit_code2);
+                status.value = help;
+                for(const enc of encodings)
+                {
+                    const opt1 = document.createElement("option");
+                    opt1.text = enc;
+                    opt1.value = enc;
+                    const opt2 = document.createElement("option");
+                    opt2.text = enc;
+                    opt2.value = enc;
+                    inputencodings.add(opt1);
+                    outputencodings.add(opt2);
+                }
+            }
         };
 
         window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
