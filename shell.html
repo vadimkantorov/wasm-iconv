@@ -11,7 +11,7 @@
         <label for="outputencoding">-t</label>
         <input type="text" id="outputencoding" name="outputencoding" value="utf-16" />
         <br />
-        <button onclick="onclick()">iconv</button>
+        <button onclick="iconv_onclick()">iconv</button>
 
         <div id="status">Downloading...</div>
         <textarea id="output" rows="8"></textarea>
@@ -20,58 +20,63 @@
         // https://stackoverflow.com/questions/32912129/providing-stdin-to-an-emscripten-html-program/33119868#33119868
         // https://stackoverflow.com/questions/15980585/how-to-change-emscripten-browser-input-method-from-window-prompt-to-something-mo
         // https://github.com/emscripten-core/emscripten/issues/8231
-        var statusElement = document.getElementById('status');
-        var element = document.getElementById('output');
+        const statusElement = document.getElementById('status');
+        const outputElement = document.getElementById('output');
+
+        const fileupload = document.getElementById('inputfile');
+        const inputencoding = document.getElementById('inputencoding');
+        const outputencoding = document.getElementById('outputencoding');
+            
   
-        var Module = {
-          stdin: () => null,
-          print: (text) => {
-              if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-              console.log(text);
-              if (element) {
-                element.value += text + "\n";
-                element.scrollTop = element.scrollHeight; // focus on bottom
-              }
+        var Module = 
+        {
+            thisProgram : '/usr/bin/iconv',
+            noInitialRun : true,
+            stdin: () => null,
+            print: text => 
+            {
+                if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                console.log(text);
+                if (outputElement) 
+                {
+                    outputElement.value += text + '\n';
+                    outputElement.scrollTop = outputElement.scrollHeight;
+                }
             },
-          setStatus: (text) => {
-            if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
-            if (text === Module.setStatus.last.text) return;
-            var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-            var now = Date.now();
-            if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
-            Module.setStatus.last.time = now;
-            Module.setStatus.last.text = text;
-            statusElement.innerHTML = text;
-          },
-          /*totalDependencies: 0,
-          monitorRunDependencies: (left) => {
-            this.totalDependencies = Math.max(this.totalDependencies, left);
-            Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-          }*/
+            setStatus: text => 
+            {
+                if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+                if (text === Module.setStatus.last.text) return;
+                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+                var now = Date.now();
+                if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+                Module.setStatus.last.time = now;
+                Module.setStatus.last.text = text;
+                statusElement.innerHTML = text;
+            },
         };
         Module.setStatus('Preparing...');
-        window.onerror = () => {
-          Module.setStatus('Exception thrown, see JavaScript console');
-          Module.setStatus = (text) => {
-            if (text) console.error('[post-exception status] ' + text);
-          };
-        };
+        window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
         
-        function onclick()
+        function iconv_onclick()
         {
-            const fileupload = document.getElementById('inputfile');
+            const input_path = 'input.bin', output_path = 'output.bin';
+            const args = ['-f', inputencoding.value, '-t', outputencoding.value, '-o', output_path, input_path];
+
             if(fileupload.files.length == 0)
                 return;
 
             const file = fileupload.files[0];
             const reader = new FileReader();
-            reader.onloadend = evt => {
+            reader.onloadend = evt => 
+            {
                 if (evt.target.readyState == FileReader.DONE)
                 {
-                    const arr = new Uint8Array(reader.result);
-                    consoel.log(arr);
-                    //Module.FS.writeFile(dst_path, arr);
-                    //resolve(dst_path);
+                    const input_uint8_array = new Uint8Array(reader.result);
+                    Module.FS.writeFile(input_path, input_uint8_array);
+                    Module.callMain(args);
+                    const output_uint8_array = Module.FS.readFile(output_path);
+                    console.log(output_uint8_array);
                 }
             }
             reader.readAsArrayBuffer(file);
