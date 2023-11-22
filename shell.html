@@ -12,44 +12,31 @@
         <input type="text" id="outputencoding" name="outputencoding" value="utf-16" />
         <br />
         <button onclick="iconv_onclick()">iconv</button>
-
-        <div id="status">Downloading...</div>
+        <br />
+        <a id="download">Download result</a>
 
         <script type="text/javascript">
         // https://stackoverflow.com/questions/32912129/providing-stdin-to-an-emscripten-html-program/33119868#33119868
         // https://stackoverflow.com/questions/15980585/how-to-change-emscripten-browser-input-method-from-window-prompt-to-something-mo
         // https://github.com/emscripten-core/emscripten/issues/8231
-        const statusElement = document.getElementById('status');
-
+        
         const fileupload = document.getElementById('inputfile');
+        const downloadElement = document.getElementById('download');
         const inputencoding = document.getElementById('inputencoding');
         const outputencoding = document.getElementById('outputencoding');
             
-  
         var Module = 
         {
             thisProgram : '/usr/bin/iconv',
             noInitialRun : true,
             stdin: () => null,
-            print: text => 
-            {
-                if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-                console.log(text);
-            },
-            setStatus: text => 
-            {
-                if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
-                if (text === Module.setStatus.last.text) return;
-                var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-                var now = Date.now();
-                if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
-                Module.setStatus.last.time = now;
-                Module.setStatus.last.text = text;
-                statusElement.innerHTML = text;
-            },
+            print: text => console.log(text);
+            setStatus: text => console.log(text);
         };
 
-        function iconv(input_uint8_array, input_encoding, output_encoding)
+        window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
+
+        function iconv(Module, input_uint8_array, input_encoding, output_encoding)
         {
             const input_path = 'input.bin', output_path = 'output.bin';
             //const args = ['-f', inputencoding.value, '-t', outputencoding.value, '-o', output_path, input_path];
@@ -57,9 +44,11 @@
 
             Module.FS.writeFile(input_path, input_uint8_array);
             console.log('exit code:', Module.callMain(args));
-            return null;
+            
             //const output_uint8_array = Module.FS.readFile(output_path);
-            //return output_uint8_array;
+            const output_uint8_array = new Uint8Array([1, 2, 3]);
+            
+            return output_uint8_array;
         }
 
         function iconv_onclick()
@@ -74,15 +63,15 @@
                 if (evt.target.readyState == FileReader.DONE)
                 {
                     const input_uint8_array = new Uint8Array(reader.result);
-                    const output_uint8_array = iconv(input_uint8_array, inputencoding.value, outputencoding.value);
-                    console.log(output_uint8_array);
+                    const output_uint8_array = iconv(Module, input_uint8_array, inputencoding.value, outputencoding.value);
+                    const mime = '';
+                    download.download = file_path;
+                    download.href = URL.createObjectURL(new Blob([output_uint8_array], {type: mime}));
                 }
             }
             reader.readAsArrayBuffer(file);
         }
         
-        Module.setStatus('Preparing...');
-        window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
 
         </script>
 
