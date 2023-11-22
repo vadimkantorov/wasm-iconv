@@ -29,24 +29,25 @@
         {
             thisProgram : '/usr/bin/iconv',
             noInitialRun : true,
-            stdin: () => null,
-            print: text => console.log(text);
-            setStatus: text => console.log(text);
+            output_stdout_binary : [],
+            print: text => console.log(text),
+            setStatus: text => console.log(text),
+            //stdin: () => null,
+            stdout: ord => Module.output_stdout_binary.push(ord)
         };
 
         window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
 
-        function iconv(Module, input_uint8_array, input_encoding, output_encoding)
+        function iconv(Module, input_uint8_array, input_encoding, output_encoding, input_path = 'input.bin')
         {
-            const input_path = 'input.bin', output_path = 'output.bin';
-            //const args = ['-f', inputencoding.value, '-t', outputencoding.value, '-o', output_path, input_path];
-            const args = ['--help'];
+            const args = ['-f', inputencoding.value, '-t', outputencoding.value, input_path];
 
             Module.FS.writeFile(input_path, input_uint8_array);
-            console.log('exit code:', Module.callMain(args));
+            Module.output_stdout_binary = [];
+            const exit_code = Module.callMain(args);
+            const output_uint8_array = new Uint8Array(Module.output_stdout_binary);
             
-            //const output_uint8_array = Module.FS.readFile(output_path);
-            const output_uint8_array = new Uint8Array([1, 2, 3]);
+            console.log('exit code:', exit_code);
             
             return output_uint8_array;
         }
@@ -64,9 +65,19 @@
                 {
                     const input_uint8_array = new Uint8Array(reader.result);
                     const output_uint8_array = iconv(Module, input_uint8_array, inputencoding.value, outputencoding.value);
-                    const mime = '';
-                    download.download = file_path;
+                    const output_file_name = 'output.txt';
+                    const mime = 'text';
+                    download.download = output_file_name;
                     download.href = URL.createObjectURL(new Blob([output_uint8_array], {type: mime}));
+                    /*
+                    const a = document.createElement('a');
+                    a.download = file_path;
+                    a.href = URL.createObjectURL(new Blob([content], {type: mime}));
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    a.click();
+                    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, timeout_millisec);
+                    */
                 }
             }
             reader.readAsArrayBuffer(file);
