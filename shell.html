@@ -2,24 +2,24 @@
 <html charset="utf-8" lang="en">
     <head><title>iconv</title></head>
     <body>
-        <label for="inputfile">Choose input file for re-coding with iconv:</label>
+        <label for="inputfile">Input file for text transcoding:</label>
         <input type="file" id="inputfile" name="inputfile" />
         <br />
-        <label for="inputencoding">-f</label>
-        <input type="text" id="inputencoding" name="inputencoding" value="UTF-8" />
+        <label for="inputencoding">Input encoding [-f]:</label>
         <select id="inputencodings">
             <option value="UTF-8" selected>UTF-8</option>
             <option value="UTF-16">UTF-16</option>
             <option disabled>--------</option>
         </select>
+        <input type="text" id="inputencoding" name="inputencoding" value="UTF-8" />
         <br />
-        <label for="outputencoding">-t</label>
-        <input type="text" id="outputencoding" name="outputencoding" value="UTF-16" />
+        <label for="outputencoding">Output encoding [-t]:</label>
         <select id="outputencodings">
             <option value="UTF-8">UTF-8</option>
             <option value="UTF-16" selected>UTF-16</option>
             <option disabled>--------</option>
         </select>
+        <input type="text" id="outputencoding" name="outputencoding" value="UTF-16" />
         <br />
         <button onclick="iconv_onclick()">iconv</button>
         <br />
