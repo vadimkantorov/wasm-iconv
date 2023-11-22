@@ -14,14 +14,12 @@
         <button onclick="iconv_onclick()">iconv</button>
 
         <div id="status">Downloading...</div>
-        <textarea id="output" rows="8"></textarea>
 
         <script type="text/javascript">
         // https://stackoverflow.com/questions/32912129/providing-stdin-to-an-emscripten-html-program/33119868#33119868
         // https://stackoverflow.com/questions/15980585/how-to-change-emscripten-browser-input-method-from-window-prompt-to-something-mo
         // https://github.com/emscripten-core/emscripten/issues/8231
         const statusElement = document.getElementById('status');
-        const outputElement = document.getElementById('output');
 
         const fileupload = document.getElementById('inputfile');
         const inputencoding = document.getElementById('inputencoding');
@@ -37,11 +35,6 @@
             {
                 if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
                 console.log(text);
-                if (outputElement) 
-                {
-                    outputElement.value += text + '\n';
-                    outputElement.scrollTop = outputElement.scrollHeight;
-                }
             },
             setStatus: text => 
             {
