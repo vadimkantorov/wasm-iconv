@@ -8,6 +8,7 @@ libiconv:
 	tar -xf libiconv-*.tar.gz -C $@
 
 iconv.html: libiconv
+	ls
 	cd $<
 	ls
 	emconfigure ./configure --enable-static --disable-shared
