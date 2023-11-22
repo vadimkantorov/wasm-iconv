@@ -9,8 +9,8 @@ libiconv:
 
 iconv.html: libiconv
 	ls
+	ls libiconv
 	cd $<
-	ls
 	emconfigure ./configure --enable-static --disable-shared
 	cd ..
 	emmake make -C $<
