@@ -5,11 +5,9 @@ EM_LDFLAGS = -Oz --shell-file shell.html -sSINGLE_FILE -sMINIFY_HTML=0  -sEXIT_R
 libiconv:
 	curl -L -O $(URL)
 	mkdir -p $@
-	tar -xf libiconv-*.tar.gz -C $@
+	tar -xf libiconv-*.tar.gz --strip-components=1 -C $@
 
 iconv.html: libiconv
-	ls
-	ls libiconv
 	cd $<
 	emconfigure ./configure --enable-static --disable-shared
 	cd ..
