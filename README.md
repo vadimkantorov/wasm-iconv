@@ -13,13 +13,13 @@ This repo can also serve as a primer of converting a UNIX utility program to a s
 # assumes installed Emscripten's emcc/emmake
 
 # download and extract GNU libiconv sources
-make libiconv
+which curl && make libiconv
 
 # build and produce `./iconv.html`
-test -d libiconv && make iconv.html
+which emcc && test -d libiconv && make iconv.html
 
 # deploy `./iconv.html` to GitHub Pages by creating and pushing into `gh-pages` branch
-test -f iconv.html && make deploy
+which git && test -f iconv.html && make deploy
 ```
 
 # License
