@@ -3,7 +3,7 @@ Deployed online at https://vadimkantorov.github.io/wasm-iconv
 # wasm-iconv
 `iconv` program (from [GNU libiconv](https://www.gnu.org/software/libiconv)) compiled to WebAssembly using [Emscripten](https://github.com/emscripten-core/emscripten) and embedded in a single-file HTML.
 
-`iconv.html` standalone file is also published in [Releases](../../releases), i.e. https://github.com/vadimkantorov/wasm-iconv/releases/download/release/iconv.html
+`iconv.html` standalone file is also published in [Releases](../../releases), i.e. you can download https://github.com/vadimkantorov/wasm-iconv/releases/download/release/iconv.html and just click/open it in your local web browser from the local file system.
 
 This repo can also serve as a primer of converting a UNIX utility program to a self-contained webpage.
 
