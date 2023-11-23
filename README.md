@@ -1,1 +1,1 @@
-Deploys via GitHub Pages to https://vadimkantorov.github.io/wasm-iconv
+Deploys via GitHub Pages to https://vadimkantorov.github.io/wasm-iconv/
