@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html charset="utf-8" lang="en">
-    <head><title>iconv</title></head>
+    <head>
+        <title>iconv</title>
+        <meta charset="utf-8">
+        <meta name="description" content="Change text file encoding online, client-side using GNU iconv compiled to WebAssembly / WASM using Emscripten">
+    </head>
     <body>
-        <h1>Change text file encoding using <a href="https://www.gnu.org/software/libiconv">GNU iconv</a> compiled to WebAssembly using <a href="https://emscripten.org">Emscripten</a></h1>
+        <h1>Change text file encoding online, client-side using <a href="https://www.gnu.org/software/libiconv">GNU iconv</a> compiled to WebAssembly using <a href="https://emscripten.org">Emscripten</a></h1>
+        <h3><a href="https://github.com/vadimkantorov/wasm-iconv">Source code</a> of this project</h3>
         <label for="inputfile">Input file for text transcoding:</label>
         <input type="file" id="inputfile" name="inputfile" />
         <br />
-        <label for="inputencoding">Input   encoding:</label>
+        <label for="inputencoding">Input encoding:</label>
         <select id="inputencoding" name="inputencoding">
             <option value="UTF-8" selected>UTF-8</option>
             <option value="UTF-16">UTF-16</option>
@@ -22,7 +27,7 @@
             <option disabled>--------</option>
         </select>
         <br />
-        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">Download result</a>
+        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">After transcoding, click here to download the result</a>
         <br />
         <textarea id="status" cols="80" rows="30">
         </textarea>
@@ -40,22 +45,27 @@
             thisProgram : '/usr/bin/iconv',
             noInitialRun : true,
             output_stdout_binary : [],
-            print: text => console.log(text),
-            setStatus: text => console.log(text),
+            print: text => { status.value += '\n\n' + text + '\n\n' },
+            setStatus: text => Module.print(text),
             stdout: ord => Module.output_stdout_binary.push(ord),
             onRuntimeInitialized : () => 
             {
                 Module.output_stdout_binary = [];
-                const exit_code1 = Module.callMain(['--help']);
+                const arg_help = '--help';
+                status.value += `$ ${Module.thisProgram} ${arg_help}\n`;
+                const exit_code_iconv_help = Module.callMain([arg_help]);
+                status.value += `$ echo $?\n# ${exit_code_iconv_help}\n\n`
                 const help = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary));
                 
                 Module.output_stdout_binary = [];
-                const exit_code2 = Module.callMain(['--list']);
+                const arg_list = '--list';
+                status.value += `$ ${Module.thisProgram} ${arg_list}\n`;
+                const exit_code_iconv_list = Module.callMain([arg_list]);
+                status.value += `$ echo $?\n# ${exit_code_iconv_list}\n\n`
                 const list = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary));
 
                 const encodings = list.split(/[ ,\n]/).sort().filter(enc => enc);
                 
-                console.log(exit_code1, exit_code2);
                 status.value = help;
 
                 for(const enc of encodings)
@@ -72,22 +82,6 @@
             }
         };
 
-        window.onerror = () => Module.setStatus('Exception thrown, see JavaScript console');
-
-        function iconv(Module, input_uint8_array, input_encoding, output_encoding, input_path = 'input.bin')
-        {
-            const args = ['-f', inputencoding.value, '-t', outputencoding.value, input_path];
-
-            Module.FS.writeFile(input_path, input_uint8_array);
-            Module.output_stdout_binary = [];
-            const exit_code = Module.callMain(args);
-            const output_uint8_array = new Uint8Array(Module.output_stdout_binary);
-            
-            console.log('exit code:', exit_code);
-            
-            return output_uint8_array;
-        }
-
         function iconv_onclick()
         {
             if(fileupload.files.length == 0)
@@ -99,26 +93,27 @@
             {
                 if (evt.target.readyState == FileReader.DONE)
                 {
+                    const input_path = 'input.bin'
                     const input_uint8_array = new Uint8Array(reader.result);
-                    const output_uint8_array = iconv(Module, input_uint8_array, inputencoding.value, outputencoding.value);
+                    Module.FS.writeFile(input_path, input_uint8_array);
+
+                    const args = ['-f', inputencoding.value, '-t', outputencoding.value, input_path];
+
+                    Module.output_stdout_binary = [];
+                    status.value = `$ ${Module.thisProgram} `;
+                    const exit_code_iconv = Module.callMain(args);
+                    const output_uint8_array = new Uint8Array(Module.output_stdout_binary);
+
                     const output_file_name = 'output.txt';
                     const mime = 'text';
                     download.download = output_file_name;
                     download.href = URL.createObjectURL(new Blob([output_uint8_array], {type: mime}));
-                    /*
-                    const a = document.createElement('a');
-                    a.download = file_path;
-                    a.href = URL.createObjectURL(new Blob([content], {type: mime}));
-                    a.style.display = 'none';
-                    document.body.appendChild(a);
-                    a.click();
-                    setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(a.href); }, timeout_millisec);
-                    */
                 }
             }
             reader.readAsArrayBuffer(file);
         }
         
+        window.onerror = () => Module.setStatus('exception thrown');
 
         </script>
 
