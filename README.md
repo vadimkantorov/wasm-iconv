@@ -15,11 +15,14 @@ This repo can also serve as a primer of converting a UNIX utility program to a s
 # download and extract GNU libiconv sources
 which curl && make libiconv
 
-# build and produce `./iconv.html`
+# build and produce ./iconv.html
 which emcc && test -d libiconv && make iconv.html
 
-# deploy `./iconv.html` to GitHub Pages by creating and pushing into `gh-pages` branch
+# deploy ./iconv.html to GitHub Pages by creating and pushing into `gh-pages` branch
 which git && test -f iconv.html && make deploy
+
+# release ./iconv.html to GitHub Releases by using gh tool from https://github.com/cli/cli
+which git && which gh && test -f iconv.html && make release
 ```
 
 # License

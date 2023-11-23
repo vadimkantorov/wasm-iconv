@@ -15,8 +15,12 @@ iconv.html: libiconv
 .PHONY: deploy
 deploy: iconv.html
 	git checkout -b gh-pages
-	git add -f iconv.html
-	git mv -f iconv.html index.html
+	git add -f $<
+	git mv -f $< index.html
 	git commit -m deploy index.html
 	git push
 	git checkout -
+
+.PHONY: release
+release: iconv.html
+	gh release create build_wasm_$(git rev-parse HEAD)_$(date +%s) -t "HTML assets" $<
