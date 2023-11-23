@@ -6,13 +6,12 @@
         <meta name="description" content="Change text file encoding online, client-side using GNU iconv compiled to WebAssembly / WASM using Emscripten">
     </head>
     <body>
-        <h1>Change text file encoding online, client-side using <a href="https://www.gnu.org/software/libiconv">GNU iconv</a> compiled to WebAssembly using <a href="https://emscripten.org">Emscripten</a></h1>
-        <h3><a href="https://github.com/vadimkantorov/wasm-iconv">Source code</a> of this project</h3>
-        <blockquote>This is useful for converting CSV files from various sources from UTF-8 to UTF-16LE which is better supported by Excel</blockquote>
-        <label for="inputfile">Input file for text transcoding:</label>
+        <h1>Change text file encoding online, client-side using <a href="https://www.gnu.org/software/libiconv">GNU iconv</a> compiled to WebAssembly using <a href="https://emscripten.org">Emscripten</a>, <a href="https://github.com/vadimkantorov/wasm-iconv">source code here</a></h1>
+        <p>This is useful for converting CSV files from various sources from UTF-8 to UTF-16LE which is better supported by Excel</p>
+        <label for="inputfile" style="font-family:monospace">&nbsp;Input file&nbsp;&nbsp;&nbsp;&nbsp;:</label>
         <input type="file" id="inputfile" name="inputfile" />
         <br />
-        <label for="inputencoding">Input encoding:</label>
+        <label for="inputencoding" style="font-family:monospace">&nbsp;Input encoding:</label>
         <select id="inputencoding" name="inputencoding">
             <option value="UTF-8" selected>UTF-8</option>
             <option value="UTF-16">UTF-16</option>
@@ -20,7 +19,7 @@
             <option disabled>--------</option>
         </select>
         <br />
-        <label for="outputencoding">Output encoding:</label>
+        <label for="outputencoding" style="font-family:monospace">Output encoding:</label>
         <select id="outputencoding" name="outputencoding">
             <option value="UTF-8">UTF-8</option>
             <option value="UTF-16">UTF-16</option>
@@ -28,9 +27,9 @@
             <option disabled>--------</option>
         </select>
         <br />
-        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">After transcoding, click here to download the result<span id="outputfilename"></span></a>
+        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">After transcoding, click here to download the result:&nbsp;<span id="outputfilename"></span></a>
         <br />
-        <textarea id="statusarea" cols="80" rows="30">
+        <textarea id="statusarea" cols="100" rows="30">
         </textarea>
 
         <script type="text/javascript">
@@ -47,7 +46,7 @@
             thisProgram : '/usr/bin/iconv',
             noInitialRun : true,
             output_stdout_binary : [],
-            print: text => { statusarea.value += '\n\n' + text + '\n\n' },
+            print: text => { statusarea.value += `\n# ${text}\n\n`; },
             setStatus: text => Module.print(text),
             stdout: ord => Module.output_stdout_binary.push(ord),
             onRuntimeInitialized : () => 
@@ -95,22 +94,22 @@
             {
                 if (evt.target.readyState == FileReader.DONE)
                 {
-                    const input_file_name = Module.PATH.basename(evt.target.value);
+                    const input_file_name = fileupload.value.slice(1 + Math.max(fileupload.value.lastIndexOf('/'), fileupload.value.lastIndexOf('\\')));
                     const last_dot_idx = input_file_name.lastIndexOf('.');
                     const ext = last_dot_idx <= 0 ? '' : input_file_name.slice(last_dot_idx + 1);
 
-                    const output_file_name = input_file_name + (ext == '' ? ('_' + outputencoding.value) + ('.' + outputencoding.value + '.' + ext));
+                    const output_file_name = input_file_name + (ext == '' ? ('_' + outputencoding.value) : ('.' + outputencoding.value + '.' + ext));
 
                     const input_uint8_array = new Uint8Array(reader.result);
-                    Module.FS.writeFile(input_path, input_uint8_array);
+                    Module.FS.writeFile(input_file_name, input_uint8_array);
 
                     Module.output_stdout_binary = [];
-                    statusarea.value = `$ ${Module.thisProgram} --from-code=${inputencoding.value} --to-code=${outputencoding.value} ${input_file_name} > ${output_file_name}`;
+                    statusarea.value = `$ ${Module.thisProgram} --from-code=${inputencoding.value} --to-code=${outputencoding.value} ${input_file_name} > ${output_file_name}\n`;
                     const exit_code_iconv = Module.callMain(['--from-code', inputencoding.value, '--to-code', outputencoding.value, input_file_name]);
                     const output_uint8_array = new Uint8Array(Module.output_stdout_binary);
                     statusarea.value += `$ echo $?\n# ${exit_code_iconv}\n\n`
 
-                    outputfilename.innerText = ouptut_file_name;
+                    outputfilename.innerText = output_file_name;
                     download.download = output_file_name;
                     download.href = URL.createObjectURL(new Blob([output_uint8_array], {type: 'text'}));
                 }
