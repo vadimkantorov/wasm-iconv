@@ -15,8 +15,7 @@ iconv.html: libiconv
 .PHONY: deploy
 deploy: 
 	git checkout gh-pages || git checkout -b gh-pages
-	git add -f iconv.html
-	git mv -f iconv.html index.html
-	git commit -m deploy index.html
-	git push
+	-git add -f iconv.html
+	-git mv -f iconv.html index.html
+	-git commit -m deploy index.html && git push
 	git checkout -
