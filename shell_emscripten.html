@@ -27,7 +27,12 @@
             <option disabled>--------</option>
         </select>
         <br />
-        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">After transcoding, click here to download the result:&nbsp;<span id="outputfilename"></span></a>
+        <label for="iconv" style="font-family:monospace">Run transcoding:</label>
+        <button name="iconv" onclick="iconv_onclick()">Transcode with iconv</button>
+
+        <br />
+        <label for="download" style="font-family:monospace">Download result:</label>
+        <a name="download" id="download">After transcoding, click here to download the result:&nbsp;<span id="outputfilename"></span></a>
         <br />
         <textarea id="statusarea" cols="100" rows="20"># Status messages:</textarea>
 
