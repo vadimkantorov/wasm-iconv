@@ -16,13 +16,14 @@ jobs:
         run: make libiconv
         
       - name: Build
-        run: make iconv.html
+        run: make iconv.html -j2
         
       - name: Archive artifacts
         uses: actions/upload-artifact@v3
         with:
           name: build
           path: iconv.html
+
 #      - name: Create Release
 #        env:
 #          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

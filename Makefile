@@ -9,5 +9,5 @@ libiconv:
 
 iconv.html: libiconv
 	cd $< && emconfigure ./configure --enable-static --disable-shared
-	emmake make -C $<
+	emmake $(MAKE) -C $<
 	emcc -o $@ $(EM_LDFLAGS) $</src/iconv.o $</srclib/libicrt.a $</lib/.libs/libiconv.a
