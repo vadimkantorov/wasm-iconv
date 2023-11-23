@@ -11,3 +11,11 @@ iconv.html: libiconv
 	cd $< && emconfigure ./configure --enable-static --disable-shared
 	emmake $(MAKE) -C $<
 	emcc -o $@ $(EM_LDFLAGS) $</src/iconv.o $</srclib/libicrt.a $</lib/.libs/libiconv.a
+
+.PHONY: deploy
+deploy: iconv.html
+	git checkout -b gh-pages
+	git add -f iconv.html
+	git mv -f iconv.html index.html
+	git commit index.html -m deploy
+	git push
