@@ -13,7 +13,7 @@ iconv.html: libiconv
 	emcc -o $@ $(EM_LDFLAGS) $</src/iconv.o $</srclib/libicrt.a $</lib/.libs/libiconv.a
 
 .PHONY: deploy
-deploy: | iconv.html
+deploy: 
 	git checkout gh-pages || git checkout -b gh-pages
 	git add -f iconv.html
 	git mv -f iconv.html index.html
