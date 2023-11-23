@@ -8,6 +8,7 @@
     <body>
         <h1>Change text file encoding online, client-side using <a href="https://www.gnu.org/software/libiconv">GNU iconv</a> compiled to WebAssembly using <a href="https://emscripten.org">Emscripten</a></h1>
         <h3><a href="https://github.com/vadimkantorov/wasm-iconv">Source code</a> of this project</h3>
+        <blockquote>This is useful for converting CSV files from various sources from UTF-8 to UTF-16LE which is better supported by Excel</blockquote>
         <label for="inputfile">Input file for text transcoding:</label>
         <input type="file" id="inputfile" name="inputfile" />
         <br />
@@ -22,51 +23,52 @@
         <label for="outputencoding">Output encoding:</label>
         <select id="outputencoding" name="outputencoding">
             <option value="UTF-8">UTF-8</option>
-            <option value="UTF-16" selected>UTF-16</option>
-            <option value="UTF-16LE">UTF-16LE</option>
+            <option value="UTF-16">UTF-16</option>
+            <option value="UTF-16LE" selected>UTF-16LE</option>
             <option disabled>--------</option>
         </select>
         <br />
-        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">After transcoding, click here to download the result</a>
+        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">After transcoding, click here to download the result<span id="outputfilename"></span></a>
         <br />
-        <textarea id="status" cols="80" rows="30">
+        <textarea id="statusarea" cols="80" rows="30">
         </textarea>
 
         <script type="text/javascript">
         
-        const status = document.getElementById('status');
+        const statusarea = document.getElementById('statusarea');
         const fileupload = document.getElementById('inputfile');
         const downloadElement = document.getElementById('download');
         const inputencoding = document.getElementById('inputencoding');
         const outputencoding = document.getElementById('outputencoding');
+        const outputfilename = document.getElementById('outputfilename');
             
         var Module = 
         {
             thisProgram : '/usr/bin/iconv',
             noInitialRun : true,
             output_stdout_binary : [],
-            print: text => { status.value += '\n\n' + text + '\n\n' },
+            print: text => { statusarea.value += '\n\n' + text + '\n\n' },
             setStatus: text => Module.print(text),
             stdout: ord => Module.output_stdout_binary.push(ord),
             onRuntimeInitialized : () => 
             {
                 Module.output_stdout_binary = [];
                 const arg_help = '--help';
-                status.value += `$ ${Module.thisProgram} ${arg_help}\n`;
+                statusarea.value += `$ ${Module.thisProgram} ${arg_help}\n`;
                 const exit_code_iconv_help = Module.callMain([arg_help]);
-                status.value += `$ echo $?\n# ${exit_code_iconv_help}\n\n`
+                statusarea.value += `$ echo $?\n# ${exit_code_iconv_help}\n\n`
                 const help = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary));
+                statusarea.value += help + '\n\n';
                 
                 Module.output_stdout_binary = [];
                 const arg_list = '--list';
-                status.value += `$ ${Module.thisProgram} ${arg_list}\n`;
+                statusarea.value += `$ ${Module.thisProgram} ${arg_list}\n`;
                 const exit_code_iconv_list = Module.callMain([arg_list]);
-                status.value += `$ echo $?\n# ${exit_code_iconv_list}\n\n`
+                statusarea.value += `$ echo $?\n# ${exit_code_iconv_list}\n\n`
                 const list = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary));
+                statusarea.value += list;
 
                 const encodings = list.split(/[ ,\n]/).sort().filter(enc => enc);
-                
-                status.value = help;
 
                 for(const enc of encodings)
                 {
@@ -93,21 +95,24 @@
             {
                 if (evt.target.readyState == FileReader.DONE)
                 {
-                    const input_path = 'input.bin'
+                    const input_file_name = Module.PATH.basename(evt.target.value);
+                    const last_dot_idx = input_file_name.lastIndexOf('.');
+                    const ext = last_dot_idx <= 0 ? '' : input_file_name.slice(last_dot_idx + 1);
+
+                    const output_file_name = input_file_name + (ext == '' ? ('_' + outputencoding.value) + ('.' + outputencoding.value + '.' + ext));
+
                     const input_uint8_array = new Uint8Array(reader.result);
                     Module.FS.writeFile(input_path, input_uint8_array);
 
-                    const args = ['-f', inputencoding.value, '-t', outputencoding.value, input_path];
-
                     Module.output_stdout_binary = [];
-                    status.value = `$ ${Module.thisProgram} `;
-                    const exit_code_iconv = Module.callMain(args);
+                    statusarea.value = `$ ${Module.thisProgram} --from-code=${inputencoding.value} --to-code=${outputencoding.value} ${input_file_name} > ${output_file_name}`;
+                    const exit_code_iconv = Module.callMain(['--from-code', inputencoding.value, '--to-code', outputencoding.value, input_file_name]);
                     const output_uint8_array = new Uint8Array(Module.output_stdout_binary);
+                    statusarea.value += `$ echo $?\n# ${exit_code_iconv}\n\n`
 
-                    const output_file_name = 'output.txt';
-                    const mime = 'text';
+                    outputfilename.innerText = ouptut_file_name;
                     download.download = output_file_name;
-                    download.href = URL.createObjectURL(new Blob([output_uint8_array], {type: mime}));
+                    download.href = URL.createObjectURL(new Blob([output_uint8_array], {type: 'text'}));
                 }
             }
             reader.readAsArrayBuffer(file);
