@@ -6,22 +6,20 @@
         <input type="file" id="inputfile" name="inputfile" />
         <br />
         <label for="inputencoding">Input   encoding [-f]:</label>
-        <select id="inputencodings">
+        <select id="inputencoding" name="inputencoding">
             <option value="UTF-8" selected>UTF-8</option>
             <option value="UTF-16">UTF-16</option>
             <option value="UTF-16LE">UTF-16LE</option>
             <option disabled>--------</option>
         </select>
-        <input type="text" id="inputencoding" name="inputencoding" value="UTF-8" />
         <br />
         <label for="outputencoding">Output encoding [-t]:</label>
-        <select id="outputencodings">
+        <select id="outputencoding" name="outputencoding">
             <option value="UTF-8">UTF-8</option>
             <option value="UTF-16" selected>UTF-16</option>
             <option value="UTF-16LE">UTF-16LE</option>
             <option disabled>--------</option>
         </select>
-        <input type="text" id="outputencoding" name="outputencoding" value="UTF-16" />
         <br />
         <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">Download result</a>
         <br />
@@ -30,8 +28,6 @@
 
         <script type="text/javascript">
         
-        const inputencodings = document.getElementById('inputencodings');
-        const outputencodings = document.getElementById('outputencodings');
         const status = document.getElementById('status');
         const fileupload = document.getElementById('inputfile');
         const downloadElement = document.getElementById('download');
@@ -69,8 +65,8 @@
                     const opt2 = document.createElement("option");
                     opt2.text = enc;
                     opt2.value = enc;
-                    inputencodings.add(opt1);
-                    outputencodings.add(opt2);
+                    inputencoding.add(opt1);
+                    outputencoding.add(opt2);
                 }
             }
         };
