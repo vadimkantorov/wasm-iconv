@@ -17,5 +17,6 @@ deploy: iconv.html
 	git checkout -b gh-pages
 	git add -f iconv.html
 	git mv -f iconv.html index.html
-	git commit index.html -m deploy
+	git commit -m deploy index.html
 	git push
+	git checkout -
