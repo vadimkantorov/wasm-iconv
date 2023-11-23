@@ -20,9 +20,6 @@ which emcc && test -d libiconv && make iconv.html
 
 # deploy ./iconv.html to GitHub Pages by creating and pushing into `gh-pages` branch
 which git && test -f iconv.html && make deploy
-
-# release ./iconv.html to GitHub Releases by using gh tool from https://github.com/cli/cli
-which git && which gh && test -f iconv.html && make release
 ```
 
 # License
