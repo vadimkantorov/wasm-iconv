@@ -7,7 +7,7 @@ libiconv:
 	mkdir -p $@
 	tar -xf libiconv-*.tar.gz --strip-components=1 -C $@
 
-iconv.html: | libiconv
+iconv.html: libiconv
 	cd $< && emconfigure ./configure --enable-static --disable-shared
 	emmake $(MAKE) -C $<
 	emcc -o $@ $(EM_LDFLAGS) $</src/iconv.o $</srclib/libicrt.a $</lib/.libs/libiconv.a
@@ -15,8 +15,8 @@ iconv.html: | libiconv
 .PHONY: deploy
 deploy: | iconv.html
 	git checkout gh-pages || git checkout -b gh-pages
-	git add -f $<
-	git mv -f $< index.html
+	git add -f iconv.html
+	git mv -f iconv.html index.html
 	git commit -m deploy index.html
 	git push
 	git checkout -
