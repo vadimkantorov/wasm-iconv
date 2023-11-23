@@ -5,7 +5,7 @@
         <label for="inputfile">Input file for text transcoding:</label>
         <input type="file" id="inputfile" name="inputfile" />
         <br />
-        <label for="inputencoding">Input encoding [-f]:</label>
+        <label for="inputencoding">Input   encoding [-f]:</label>
         <select id="inputencodings">
             <option value="UTF-8" selected>UTF-8</option>
             <option value="UTF-16">UTF-16</option>
@@ -21,19 +21,12 @@
         </select>
         <input type="text" id="outputencoding" name="outputencoding" value="UTF-16" />
         <br />
-        <button onclick="iconv_onclick()">iconv</button>
-        <br />
-        <a id="download">Download result</a>
-        <br />
-        Status:
+        <button onclick="iconv_onclick()">Transcode with iconv</button><a id="download">Download result</a>
         <br />
         <textarea id="status" cols="80" rows="30">
         </textarea>
 
         <script type="text/javascript">
-        // https://stackoverflow.com/questions/32912129/providing-stdin-to-an-emscripten-html-program/33119868#33119868
-        // https://stackoverflow.com/questions/15980585/how-to-change-emscripten-browser-input-method-from-window-prompt-to-something-mo
-        // https://github.com/emscripten-core/emscripten/issues/8231
         
         const inputencodings = document.getElementById('inputencodings');
         const outputencodings = document.getElementById('outputencodings');
@@ -59,10 +52,13 @@
                 
                 Module.output_stdout_binary = [];
                 const exit_code2 = Module.callMain(['--list']);
-                const encodings = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary)).split(/[ ,\n]/).sort().filter(enc => enc);
+                const list = new TextDecoder().decode(new Uint8Array(Module.output_stdout_binary));
+
+                const encodings = list.split(/[ ,\n]/).sort().filter(enc => enc);
                 
                 console.log(exit_code1, exit_code2);
                 status.value = help;
+
                 for(const enc of encodings)
                 {
                     const opt1 = document.createElement("option");
