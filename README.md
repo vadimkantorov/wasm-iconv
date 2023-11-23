@@ -3,5 +3,7 @@
 
 Deployed online at https://vadimkantorov.github.io/wasm-iconv/
 
+This repo can also serve as a primer of converting a UNIX utility program to a self-contained webpage.
+
 # License
 MIT
