@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html charset="utf-8" lang="en">
+<html lang="en">
     <head>
         <title>iconv</title>
         <meta charset="utf-8">
@@ -28,15 +28,15 @@
         </select>
         <br />
         <label for="iconv" style="font-family:monospace">Run transcoding:</label>
-        <button name="iconv" onclick="iconv_onclick()">Transcode with iconv</button>
+        <button id="iconv" name="iconv" onclick="iconv_onclick()">Transcode with iconv</button>
 
         <br />
         <label for="download" style="font-family:monospace">Download output:</label>
-        <a name="download" id="download">after transcoding, click here to download the produced output:&nbsp;<span id="outputfilename"></span></a>
+        <a id="download">after transcoding, click here to download the produced output:&nbsp;<span id="outputfilename"></span></a>
         <br />
         <textarea id="statusarea" cols="100" rows="20" readonly># Status messages:</textarea>
 
-        <script type="text/javascript">
+        <script>
         
         const statusarea = document.getElementById('statusarea');
         const fileupload = document.getElementById('inputfile');
